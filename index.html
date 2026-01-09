@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Control de inventario Serviexpress</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Inventario con Exportación Excel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), #1a2530);
+            color: white;
+            padding: 25px 0;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo i {
+            font-size: 2.2rem;
+            color: var(--secondary-color);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #bdc3c7;
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+
+        .btn-category {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            background-color: #f0f7ff;
+            color: var(--secondary-color);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-category:hover {
+            background-color: #e1f0ff;
+        }
+
+        .btn-category.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .product-name {
+            font-weight: 600;
+        }
+
+        .quantity-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-badge {
+            background-color: #e8f4fc;
+            color: var(--secondary-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .supplier-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background-color: #f0f0f0;
+            color: #555;
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .edit-btn {
+            background-color: #f0f7ff;
+            color: var(--secondary-color);
+        }
+
+        .edit-btn:hover {
+            background-color: #e1f0ff;
+        }
+
+        .delete-btn {
+            background-color: #fef0f0;
+            color: var(--accent-color);
+        }
+
+        .delete-btn:hover {
+            background-color: #fde0e0;
+        }
+
+        .subtract-btn {
+            background-color: #fff4e6;
+            color: var(--warning-color);
+        }
+
+        .subtract-btn:hover {
+            background-color: #ffe8cc;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .alert.show {
+            opacity: 1;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-container input, .search-container select {
+            flex-grow: 1;
+        }
+
+        .categories-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+
+        .suppliers-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+
+        .color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stats-by-category {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .category-stat {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .category-stat-name {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .category-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #7f8c8d;
+            cursor: pointer;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: var(--secondary-color);
+        }
+
+        .tab.active {
+            color: var(--secondary-color);
+            border-bottom: 3px solid var(--secondary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .provider-list {
+            margin-top: 20px;
+        }
+
+        .provider-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+        }
+
+        .provider-name {
+            font-weight: 600;
+        }
+
+        .provider-products-count {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .subtract-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .subtract-form input {
+            flex-grow: 1;
+        }
+
+        .provider-select-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .add-provider-btn {
+            padding: 10px;
+            background-color: #f0f7ff;
+            color: var(--secondary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .export-preview {
+            margin-top: 20px;
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .export-preview table {
+            margin: 0;
+        }
+
+        .export-preview th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .export-preview td, .export-preview th {
+            padding: 10px;
+            border: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-warehouse"></i>
+                    <div>
+                        <h1>Control de Inventario Serviexpress</h1>
+                        <p class="subtitle">Gestión de productos, categorías y proveedores</p>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-products">0</div>
+                        <div class="stat-label">Productos</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-items">0</div>
+                        <div class="stat-label">Unidades</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-categories">0</div>
+                        <div class="stat-label">Categorías</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-suppliers">0</div>
+                        <div class="stat-label">Proveedores</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="alert-container"></div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="inventory">Inventario</button>
+            <button class="tab" data-tab="providers">Proveedores</button>
+            <button class="tab" data-tab="export">Exportar a Excel</button>
+        </div>
+        
+        <div class="tab-content active" id="inventory-tab">
+            <div class="main-content">
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-plus-circle"></i> Agregar Nuevo Producto</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="product-form">
+                                <div class="form-group">
+                                    <label for="product-name"><i class="fas fa-box"></i> Nombre del Producto</label>
+                                    <input type="text" id="product-name" placeholder="Ej: Laptop Dell XPS 15" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="product-category"><i class="fas fa-tag"></i> Categoría</label>
+                                    <select id="product-category" required>
+                                        <option value="">Selecciona una categoría</option>
+                                        <option value="Bebestibles">Bebestibles</option>
+                                        <option value="Papeles">Papeles</option>
+                                        <option value="Abarrotes">Abarrotes</option>
+                                        <option value="Congelados">Congelados</option>
+                                        <option value="Snacks">Snacks</option>
+                                        <option value="Aseo personal">Aseo personal</option>
+                                        <option value="Aseo para el hogar">Aseo para el hogar</option>
+                                        <option value="Mascotas">Mascotas</option>
+                                    </select>
+                                    <div class="category-colors">
+                                        <span style="background-color: #FF6B6B;" class="color-dot" title="Bebestibles"></span>
+                                        <span style="background-color: #4ECDC4;" class="color-dot" title="Papeles"></span>
+                                        <span style="background-color: #FFD166;" class="color-dot" title="Abarrotes"></span>
+                                        <span style="background-color: #118AB2;" class="color-dot" title="Congelados"></span>
+                                        <span style="background-color: #EF476F;" class="color-dot" title="Snacks"></span>
+                                        <span style="background-color: #06D6A0;" class="color-dot" title="Aseo personal"></span>
+                                        <span style="background-color: #9D4EDD;" class="color-dot" title="Aseo para el hogar"></span>
+                                        <span style="background-color: #FF9E6D;" class="color-dot" title="Mascotas"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="provider-select-container">
+                                        <label for="product-supplier"><i class="fas fa-truck"></i> Proveedor</label>
+                                        <button type="button" class="add-provider-btn" id="add-provider-btn" title="Agregar nuevo proveedor">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <select id="product-supplier" required>
+                                        <option value="">Selecciona un proveedor</option>
+                                        <!-- Proveedores se cargarán dinámicamente -->
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="product-quantity"><i class="fas fa-layer-group"></i> Cantidad Recibida</label>
+                                    <input type="number" id="product-quantity" min="1" value="1" required>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Guardar Producto
+                                </button>
+                            </form>
+                            
+                            <div class="stats-by-category" id="category-stats">
+                                <!-- Las estadísticas por categoría se generarán con JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-chart-pie"></i> Resumen por Proveedor</h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="supplier-stats">
+                                <!-- Las estadísticas por proveedor se generarán con JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-list-ul"></i> Inventario Actual</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="search-container">
+                                <input type="text" id="search-product" placeholder="Buscar producto por nombre...">
+                                <select id="filter-category">
+                                    <option value="">Todas las categorías</option>
+                                    <option value="Bebestibles">Bebestibles</option>
+                                    <option value="Papeles">Papeles</option>
+                                    <option value="Abarrotes">Abarrotes</option>
+                                    <option value="Congelados">Congelados</option>
+                                    <option value="Snacks">Snacks</option>
+                                    <option value="Aseo personal">Aseo personal</option>
+                                    <option value="Aseo para el hogar">Aseo para el hogar</option>
+                                    <option value="Mascotas">Mascotas</option>
+                                </select>
+                                <select id="filter-supplier">
+                                    <option value="">Todos los proveedores</option>
+                                    <!-- Proveedores se cargarán dinámicamente -->
+                                </select>
+                            </div>
+                            
+                            <div class="categories-filter" id="categories-buttons">
+                                <!-- Los botones de categorías se generarán con JavaScript -->
+                            </div>
+                            
+                            <div class="suppliers-filter" id="suppliers-buttons">
+                                <!-- Los botones de proveedores se generarán con JavaScript -->
+                            </div>
+                            
+                            <div class="table-container">
+                                <table id="inventory-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Categoría</th>
+                                            <th>Proveedor</th>
+                                            <th>Cantidad</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inventory-body">
+                                        <!-- Los productos se cargarán aquí con JavaScript -->
+                                        <tr id="empty-row">
+                                            <td colspan="5">
+                                                <div class="empty-state">
+                                                    <i class="fas fa-inbox"></i>
+                                                    <p>No hay productos en el inventario. Agrega uno nuevo.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                                <button id="clear-all" class="btn btn-danger">
+                                    <i class="fas fa-trash-alt"></i> Vaciar Inventario
+                                </button>
+                                <button id="export-data" class="btn btn-success" onclick="switchTab('export')">
+                                    <i class="fas fa-file-export"></i> Exportar a Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="providers-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-truck"></i> Gestión de Proveedores</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="new-provider-name"><i class="fas fa-user-tag"></i> Nombre del Nuevo Proveedor</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="new-provider-name" placeholder="Ej: Distribuidora Los Andes">
+                            <button id="add-provider" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Agregar Proveedor
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="provider-list" id="provider-list">
+                        <!-- Lista de proveedores se cargará dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="export-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-file-excel"></i> Exportar a Excel</h2>
+                </div>
+                <div class="card-body">
+                    <p>Exporta tu inventario en formato Excel (.xlsx) con el siguiente formato:</p>
+                    
+                    <div class="export-preview">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 40%;">Proveedor</th>
+                                    <th style="width: 40%;">Producto</th>
+                                    <th style="width: 20%;">Cantidad</th>
+                                </tr>
+                            </thead>
+                            <tbody id="export-preview-body">
+                                <!-- Vista previa de exportación -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="export-options">
+                        <button id="export-current-view" class="btn btn-primary">
+                            <i class="fas fa-download"></i> Exportar Vista Actual
+                        </button>
+                        <button id="export-all" class="btn btn-success">
+                            <i class="fas fa-download"></i> Exportar Todo el Inventario
+                        </button>
+                        <button id="export-by-supplier" class="btn btn-warning">
+                            <i class="fas fa-filter"></i> Exportar por Proveedor
+                        </button>
+                        <select id="export-supplier-select" style="display: none;">
+                            <option value="">Selecciona un proveedor</option>
+                            <!-- Proveedores se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: var(--border-radius);">
+                        <h3 style="margin-bottom: 15px; color: var(--primary-color);"><i class="fas fa-info-circle"></i> Instrucciones</h3>
+                        <ul style="padding-left: 20px;">
+                            <li><strong>Exportar Vista Actual:</strong> Exporta los productos filtrados según tu búsqueda actual.</li>
+                            <li><strong>Exportar Todo el Inventario:</strong> Exporta todos los productos sin filtros.</li>
+                            <li><strong>Exportar por Proveedor:</strong> Exporta productos de un proveedor específico.</li>
+                            <li>El archivo se descargará en formato Excel (.xlsx) con el nombre "INVENTARIO_[FECHA].xlsx"</li>
+                            <li>El formato respeta exactamente el diseño solicitado: Columnas A, B y C con los títulos "Proveedor", "Producto" y "Cantidad"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Sistema de Control de Inventario Avanzado &copy; 2023 | Todos los datos se guardan localmente en tu navegador</p>
+        </footer>
+    </div>
+
+    <!-- Modal para descontar productos -->
+    <div class="modal" id="subtract-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Descontar Producto</h3>
+                <button class="close-modal" id="close-subtract-modal">&times;</button>
+            </div>
+            <div id="subtract-modal-body">
+                <!-- Contenido del modal se cargará dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar proveedor -->
+    <div class="modal" id="provider-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Agregar Nuevo Proveedor</h3>
+                <button class="close-modal" id="close-provider-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="modal-provider-name">Nombre del Proveedor</label>
+                <input type="text" id="modal-provider-name" placeholder="Ej: Distribuidora Los Andes">
+            </div>
+            <div class="form-group">
+                <label for="modal-provider-contact">Contacto (opcional)</label>
+                <input type="text" id="modal-provider-contact" placeholder="Ej: contacto@proveedor.com">
+            </div>
+            <div class="form-group">
+                <label for="modal-provider-phone">Teléfono (opcional)</label>
+                <input type="text" id="modal-provider-phone" placeholder="Ej: +56 9 1234 5678">
+            </div>
+            <button id="save-provider" class="btn btn-primary">Guardar Proveedor</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let inventory = [];
+        let suppliers = [];
+        const INVENTORY_STORAGE_KEY = 'inventory_data_advanced';
+        const SUPPLIERS_STORAGE_KEY = 'suppliers_data';
+
+        // Categorías predefinidas con colores
+        const CATEGORIES = {
+            'Bebestibles': '#FF6B6B',
+            'Papeles': '#4ECDC4',
+            'Abarrotes': '#FFD166',
+            'Congelados': '#118AB2',
+            'Snacks': '#EF476F',
+            'Aseo personal': '#06D6A0',
+            'Aseo para el hogar': '#9D4EDD',
+            'Mascotas': '#FF9E6D'
+        };
+
+        // Elementos del DOM
+        const productForm = document.getElementById('product-form');
+        const productNameInput = document.getElementById('product-name');
+        const productCategoryInput = document.getElementById('product-category');
+        const productSupplierInput = document.getElementById('product-supplier');
+        const productQuantityInput = document.getElementById('product-quantity');
+        const inventoryBody = document.getElementById('inventory-body');
+        const emptyRow = document.getElementById('empty-row');
+        const totalProductsElement = document.getElementById('total-products');
+        const totalItemsElement = document.getElementById('total-items');
+        const totalCategoriesElement = document.getElementById('total-categories');
+        const totalSuppliersElement = document.getElementById('total-suppliers');
+        const searchInput = document.getElementById('search-product');
+        const filterCategoryInput = document.getElementById('filter-category');
+        const filterSupplierInput = document.getElementById('filter-supplier');
+        const categoriesButtonsContainer = document.getElementById('categories-buttons');
+        const suppliersButtonsContainer = document.getElementById('suppliers-buttons');
+        const clearAllButton = document.getElementById('clear-all');
+        const alertContainer = document.getElementById('alert-container');
+        const categoryStatsContainer = document.getElementById('category-stats');
+        const supplierStatsContainer = document.getElementById('supplier-stats');
+        const providerListContainer = document.getElementById('provider-list');
+        const addProviderButton = document.getElementById('add-provider');
+        const newProviderNameInput = document.getElementById('new-provider-name');
+        const addProviderModalButton = document.getElementById('add-provider-btn');
+        const providerModal = document.getElementById('provider-modal');
+        const closeProviderModal = document.getElementById('close-provider-modal');
+        const saveProviderButton = document.getElementById('save-provider');
+        const modalProviderName = document.getElementById('modal-provider-name');
+        const modalProviderContact = document.getElementById('modal-provider-contact');
+        const modalProviderPhone = document.getElementById('modal-provider-phone');
+        const subtractModal = document.getElementById('subtract-modal');
+        const closeSubtractModal = document.getElementById('close-subtract-modal');
+        const subtractModalBody = document.getElementById('subtract-modal-body');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const exportPreviewBody = document.getElementById('export-preview-body');
+        const exportCurrentViewButton = document.getElementById('export-current-view');
+        const exportAllButton = document.getElementById('export-all');
+        const exportBySupplierButton = document.getElementById('export-by-supplier');
+        const exportSupplierSelect = document.getElementById('export-supplier-select');
+
+        // Producto seleccionado para descontar
+        let selectedProductForSubtraction = null;
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInventory();
+            loadSuppliers();
+            renderInventory();
+            updateCategoryButtons();
+            updateSupplierButtons();
+            updateCategoryStats();
+            updateSupplierStats();
+            populateSupplierDropdowns();
+            renderProviderList();
+            updateExportPreview();
+            setupEventListeners();
+            switchTab('inventory');
+        });
+
+        // Cargar inventario desde localStorage
+        function loadInventory() {
+            const savedInventory = localStorage.getItem(INVENTORY_STORAGE_KEY);
+            if (savedInventory) {
+                inventory = JSON.parse(savedInventory);
+            }
+        }
+
+        // Guardar inventario en localStorage
+        function saveInventory() {
+            localStorage.setItem(INVENTORY_STORAGE_KEY, JSON.stringify(inventory));
+        }
+
+        // Cargar proveedores desde localStorage
+        function loadSuppliers() {
+            const savedSuppliers = localStorage.getItem(SUPPLIERS_STORAGE_KEY);
+            if (savedSuppliers) {
+                suppliers = JSON.parse(savedSuppliers);
+            } else {
+                // Proveedores predeterminados
+                suppliers = [
+                    { id: 1, name: 'Distribuidora Central', contact: '', phone: '', productCount: 0 },
+                    { id: 2, name: 'Mayorista Uno', contact: '', phone: '', productCount: 0 },
+                    { id: 3, name: 'Importaciones S.A.', contact: '', phone: '', productCount: 0 }
+                ];
+                saveSuppliers();
+            }
+        }
+
+        // Guardar proveedores en localStorage
+        function saveSuppliers() {
+            localStorage.setItem(SUPPLIERS_STORAGE_KEY, JSON.stringify(suppliers));
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Enviar formulario de producto
+            productForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                addProduct();
+            });
+
+            // Buscar productos
+            searchInput.addEventListener('input', function() {
+                renderInventory();
+                updateExportPreview();
+            });
+
+            // Filtrar por categoría
+            filterCategoryInput.addEventListener('change', function() {
+                renderInventory();
+                updateExportPreview();
+            });
+
+            // Filtrar por proveedor
+            filterSupplierInput.addEventListener('change', function() {
+                renderInventory();
+                updateExportPreview();
+            });
+
+            // Vaciar inventario
+            clearAllButton.addEventListener('click', function() {
+                if (inventory.length > 0 && confirm('¿Estás seguro de que quieres vaciar todo el inventario? Esta acción no se puede deshacer.')) {
+                    inventory = [];
+                    saveInventory();
+                    renderInventory();
+                    updateCategoryButtons();
+                    updateSupplierButtons();
+                    updateCategoryStats();
+                    updateSupplierStats();
+                    updateExportPreview();
+                    showAlert('Inventario vaciado correctamente', 'success');
+                }
+            });
+
+            // Agregar proveedor desde el panel de proveedores
+            addProviderButton.addEventListener('click', function() {
+                addNewProvider();
+            });
+
+            // Agregar proveedor desde el modal
+            addProviderModalButton.addEventListener('click', function() {
+                openProviderModal();
+            });
+
+            // Guardar proveedor desde el modal
+            saveProviderButton.addEventListener('click', function() {
+                saveProviderFromModal();
+            });
+
+            // Cerrar modal de proveedor
+            closeProviderModal.addEventListener('click', function() {
+                closeProviderModalFunc();
+            });
+
+            // Cerrar modal de descuento
+            closeSubtractModal.addEventListener('click', function() {
+                closeSubtractModalFunc();
+            });
+
+            // Cerrar modales al hacer clic fuera
+            window.addEventListener('click', function(event) {
+                if (event.target === providerModal) {
+                    closeProviderModalFunc();
+                }
+                if (event.target === subtractModal) {
+                    closeSubtractModalFunc();
+                }
+            });
+
+            // Tabs
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+
+            // Exportar vista actual
+            exportCurrentViewButton.addEventListener('click', function() {
+                exportToExcel('current');
+            });
+
+            // Exportar todo
+            exportAllButton.addEventListener('click', function() {
+                exportToExcel('all');
+            });
+
+            // Exportar por proveedor
+            exportBySupplierButton.addEventListener('click', function() {
+                if (exportSupplierSelect.style.display === 'none') {
+                    exportSupplierSelect.style.display = 'block';
+                    populateExportSupplierSelect();
+                } else {
+                    const supplierId = exportSupplierSelect.value;
+                    if (supplierId) {
+                        exportToExcel('supplier', supplierId);
+                        exportSupplierSelect.style.display = 'none';
+                        exportSupplierSelect.value = '';
+                    } else {
+                        showAlert('Por favor, selecciona un proveedor', 'error');
+                    }
+                }
+            });
+
+            // Cambio en selección de proveedor para exportación
+            exportSupplierSelect.addEventListener('change', function() {
+                if (this.value) {
+                    exportToExcel('supplier', this.value);
+                    this.style.display = 'none';
+                    this.value = '';
+                }
+            });
+        }
+
+        // Cambiar entre pestañas
+        function switchTab(tabName) {
+            // Desactivar todas las pestañas
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Desactivar todos los contenidos
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Activar pestaña seleccionada
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Actualizar contenido específico de la pestaña
+            if (tabName === 'export') {
+                updateExportPreview();
+            }
+        }
+
+        // Poblar dropdowns de proveedores
+        function populateSupplierDropdowns() {
+            // Limpiar dropdowns
+            productSupplierInput.innerHTML = '<option value="">Selecciona un proveedor</option>';
+            
+            // Agregar opciones
+            suppliers.forEach(supplier => {
+                const option1 = document.createElement('option');
+                option1.value = supplier.id;
+                option1.textContent = supplier.name;
+                productSupplierInput.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = supplier.id;
+                option2.textContent = supplier.name;
+                filterSupplierInput.appendChild(option2);
+            });
+        }
+
+        // Poblar dropdown de proveedores para exportación
+        function populateExportSupplierSelect() {
+            exportSupplierSelect.innerHTML = '<option value="">Selecciona un proveedor</option>';
+            
+            suppliers.forEach(supplier => {
+                const option = document.createElement('option');
+                option.value = supplier.id;
+                option.textContent = supplier.name;
+                exportSupplierSelect.appendChild(option);
+            });
+        }
+
+        // Agregar un nuevo producto
+        function addProduct() {
+            const name = productNameInput.value.trim();
+            const category = productCategoryInput.value;
+            const supplierId = parseInt(productSupplierInput.value);
+            const quantity = parseInt(productQuantityInput.value);
+
+            // Validaciones
+            if (!name) {
+                showAlert('Por favor, introduce un nombre para el producto', 'error');
+                productNameInput.focus();
+                return;
+            }
+
+            if (!category) {
+                showAlert('Por favor, selecciona una categoría para el producto', 'error');
+                productCategoryInput.focus();
+                return;
+            }
+
+            if (!supplierId) {
+                showAlert('Por favor, selecciona un proveedor para el producto', 'error');
+                productSupplierInput.focus();
+                return;
+            }
+
+            if (isNaN(quantity) || quantity <= 0) {
+                showAlert('Por favor, introduce una cantidad válida', 'error');
+                productQuantityInput.focus();
+                return;
+            }
+
+            // Verificar si el producto ya existe (mismo nombre, categoría y proveedor)
+            const existingProductIndex = inventory.findIndex(item => 
+                item.name.toLowerCase() === name.toLowerCase() && 
+                item.category === category &&
+                item.supplierId === supplierId
+            );
+
+            if (existingProductIndex !== -1) {
+                // Actualizar cantidad si el producto ya existe
+                inventory[existingProductIndex].quantity += quantity;
+                showAlert(`Se actualizó "${name}" con ${quantity} unidades adicionales`, 'success');
+            } else {
+                // Agregar nuevo producto
+                const supplier = suppliers.find(s => s.id === supplierId);
+                const newProduct = {
+                    id: Date.now(), // ID único basado en timestamp
+                    name: name,
+                    category: category,
+                    supplierId: supplierId,
+                    supplierName: supplier ? supplier.name : 'Desconocido',
+                    quantity: quantity,
+                    dateAdded: new Date().toISOString()
+                };
+                
+                inventory.push(newProduct);
+                showAlert(`Producto "${name}" agregado con éxito`, 'success');
+            }
+
+            // Guardar, renderizar y limpiar formulario
+            saveInventory();
+            renderInventory();
+            updateCategoryButtons();
+            updateSupplierButtons();
+            updateCategoryStats();
+            updateSupplierStats();
+            updateExportPreview();
+            productForm.reset();
+            productQuantityInput.value = 1;
+            productNameInput.focus();
+        }
+
+        // Renderizar la tabla de inventario
+        function renderInventory() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedCategory = filterCategoryInput.value;
+            const selectedSupplier = filterSupplierInput.value ? parseInt(filterSupplierInput.value) : null;
+
+            // Filtrar productos según búsqueda, categoría y proveedor
+            let filteredInventory = inventory.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(searchTerm);
+                const matchesCategory = !selectedCategory || item.category === selectedCategory;
+                const matchesSupplier = !selectedSupplier || item.supplierId === selectedSupplier;
+                return matchesSearch && matchesCategory && matchesSupplier;
+            });
+
+            // Actualizar estadísticas
+            updateStats();
+
+            // Limpiar tabla
+            inventoryBody.innerHTML = '';
+
+            // Mostrar mensaje si no hay productos
+            if (filteredInventory.length === 0) {
+                inventoryBody.appendChild(emptyRow.cloneNode(true));
+                return;
+            }
+
+            // Renderizar cada producto
+            filteredInventory.forEach(product => {
+                const row = document.createElement('tr');
+                const categoryColor = CATEGORIES[product.category] || '#cccccc';
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="product-name">${product.name}</div>
+                        <small>Agregado: ${new Date(product.dateAdded).toLocaleDateString('es-ES')}</small>
+                    </td>
+                    <td>
+                        <span class="category-badge" style="background-color: ${categoryColor}20; color: ${categoryColor}; border: 1px solid ${categoryColor}40;">
+                            ${product.category}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="supplier-badge">
+                            ${product.supplierName}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="quantity-cell">
+                            <span class="quantity-badge">${product.quantity}</span>
+                            <div>
+                                <button class="action-btn edit-btn" onclick="updateQuantity(${product.id}, 1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button class="action-btn subtract-btn" onclick="openSubtractModal(${product.id})">
+                                    <i class="fas fa-minus"></i> Descontar
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <button class="action-btn edit-btn" onclick="editProduct(${product.id})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteProduct(${product.id})">
+                                <i class="fas fa-trash-alt"></i> Eliminar
+                            </button>
+                        </div>
+                    </td>
+                `;
+                inventoryBody.appendChild(row);
+            });
+        }
+
+        // Actualizar vista previa de exportación
+        function updateExportPreview() {
+            exportPreviewBody.innerHTML = '';
+            
+            // Obtener productos filtrados actuales (igual que en renderInventory)
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedCategory = filterCategoryInput.value;
+            const selectedSupplier = filterSupplierInput.value ? parseInt(filterSupplierInput.value) : null;
+
+            let filteredInventory = inventory.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(searchTerm);
+                const matchesCategory = !selectedCategory || item.category === selectedCategory;
+                const matchesSupplier = !selectedSupplier || item.supplierId === selectedSupplier;
+                return matchesSearch && matchesCategory && matchesSupplier;
+            });
+
+            // Limitar a 5 filas para la vista previa
+            const previewInventory = filteredInventory.slice(0, 5);
+            
+            if (previewInventory.length === 0) {
+                exportPreviewBody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: #7f8c8d; padding: 20px;">
+                            No hay productos para exportar
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Mostrar vista previa
+            previewInventory.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.supplierName}</td>
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                `;
+                exportPreviewBody.appendChild(row);
+            });
+
+            // Si hay más productos, mostrar indicador
+            if (filteredInventory.length > 5) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td colspan="3" style="text-align: center; color: #7f8c8d; font-style: italic;">
+                        ... y ${filteredInventory.length - 5} productos más
+                    </td>
+                `;
+                exportPreviewBody.appendChild(row);
+            }
+        }
+
+        // Actualizar estadísticas generales
+        function updateStats() {
+            const totalProducts = inventory.length;
+            const totalItems = inventory.reduce((sum, product) => sum + product.quantity, 0);
+            
+            // Calcular categorías únicas
+            const uniqueCategories = new Set(inventory.map(item => item.category));
+            const totalCategories = uniqueCategories.size;
+            
+            // Calcular proveedores únicos
+            const uniqueSuppliers = new Set(inventory.map(item => item.supplierId));
+            const totalSuppliers = uniqueSuppliers.size;
+            
+            // Actualizar contadores de productos por proveedor
+            suppliers.forEach(supplier => {
+                supplier.productCount = inventory.filter(item => item.supplierId === supplier.id).length;
+            });
+            saveSuppliers();
+            
+            totalProductsElement.textContent = totalProducts;
+            totalItemsElement.textContent = totalItems;
+            totalCategoriesElement.textContent = totalCategories;
+            totalSuppliersElement.textContent = totalSuppliers;
+        }
+
+        // Actualizar botones de categorías
+        function updateCategoryButtons() {
+            categoriesButtonsContainer.innerHTML = '<span style="font-weight: 600; margin-right: 10px;">Filtrar por categoría:</span>';
+            
+            // Agregar botón para todas las categorías
+            const allButton = document.createElement('button');
+            allButton.className = `btn-category ${filterCategoryInput.value === '' ? 'active' : ''}`;
+            allButton.textContent = 'Todas';
+            allButton.onclick = () => {
+                filterCategoryInput.value = '';
+                renderInventory();
+                updateCategoryButtons();
+                updateSupplierButtons();
+                updateExportPreview();
+            };
+            categoriesButtonsContainer.appendChild(allButton);
+            
+            // Agregar botón para cada categoría
+            Object.keys(CATEGORIES).forEach(category => {
+                const count = inventory.filter(item => item.category === category).length;
+                if (count > 0) {
+                    const button = document.createElement('button');
+                    button.className = `btn-category ${filterCategoryInput.value === category ? 'active' : ''}`;
+                    button.style.borderLeft = `4px solid ${CATEGORIES[category]}`;
+                    button.textContent = `${category} (${count})`;
+                    button.onclick = () => {
+                        filterCategoryInput.value = category;
+                        renderInventory();
+                        updateCategoryButtons();
+                        updateSupplierButtons();
+                        updateExportPreview();
+                    };
+                    categoriesButtonsContainer.appendChild(button);
+                }
+            });
+        }
+
+        // Actualizar botones de proveedores
+        function updateSupplierButtons() {
+            suppliersButtonsContainer.innerHTML = '<span style="font-weight: 600; margin-right: 10px;">Filtrar por proveedor:</span>';
+            
+            // Agregar botón para todos los proveedores
+            const allButton = document.createElement('button');
+            allButton.className = `btn-category ${filterSupplierInput.value === '' ? 'active' : ''}`;
+            allButton.textContent = 'Todos';
+            allButton.onclick = () => {
+                filterSupplierInput.value = '';
+                renderInventory();
+                updateCategoryButtons();
+                updateSupplierButtons();
+                updateExportPreview();
+            };
+            suppliersButtonsContainer.appendChild(allButton);
+            
+            // Agregar botón para cada proveedor con productos
+            suppliers.forEach(supplier => {
+                const count = inventory.filter(item => item.supplierId === supplier.id).length;
+                if (count > 0) {
+                    const button = document.createElement('button');
+                    button.className = `btn-category ${filterSupplierInput.value == supplier.id ? 'active' : ''}`;
+                    button.style.borderLeft = `4px solid #7f8c8d`;
+                    button.textContent = `${supplier.name} (${count})`;
+                    button.onclick = () => {
+                        filterSupplierInput.value = supplier.id;
+                        renderInventory();
+                        updateCategoryButtons();
+                        updateSupplierButtons();
+                        updateExportPreview();
+                    };
+                    suppliersButtonsContainer.appendChild(button);
+                }
+            });
+        }
+
+        // Actualizar estadísticas por categoría
+        function updateCategoryStats() {
+            categoryStatsContainer.innerHTML = '';
+            
+            Object.keys(CATEGORIES).forEach(category => {
+                const productsInCategory = inventory.filter(item => item.category === category);
+                const totalQuantity = productsInCategory.reduce((sum, product) => sum + product.quantity, 0);
+                
+                if (productsInCategory.length > 0) {
+                    const statElement = document.createElement('div');
+                    statElement.className = 'category-stat';
+                    statElement.innerHTML = `
+                        <div class="category-stat-name">${category}</div>
+                        <div class="category-stat-value">${totalQuantity}</div>
+                        <small>${productsInCategory.length} producto(s)</small>
+                    `;
+                    statElement.style.borderTop = `4px solid ${CATEGORIES[category]}`;
+                    categoryStatsContainer.appendChild(statElement);
+                }
+            });
+            
+            // Si no hay categorías con productos, mostrar mensaje
+            if (categoryStatsContainer.children.length === 0) {
+                categoryStatsContainer.innerHTML = '<p style="text-align: center; color: #7f8c8d; grid-column: 1 / -1;">No hay productos por categoría aún.</p>';
+            }
+        }
+
+        // Actualizar estadísticas por proveedor
+        function updateSupplierStats() {
+            supplierStatsContainer.innerHTML = '';
+            
+            suppliers.forEach(supplier => {
+                const productsBySupplier = inventory.filter(item => item.supplierId === supplier.id);
+                const totalQuantity = productsBySupplier.reduce((sum, product) => sum + product.quantity, 0);
+                
+                if (productsBySupplier.length > 0) {
+                    const statElement = document.createElement('div');
+                    statElement.className = 'category-stat';
+                    statElement.innerHTML = `
+                        <div class="category-stat-name">${supplier.name}</div>
+                        <div class="category-stat-value">${totalQuantity}</div>
+                        <small>${productsBySupplier.length} producto(s)</small>
+                    `;
+                    statElement.style.borderTop = `4px solid #7f8c8d`;
+                    supplierStatsContainer.appendChild(statElement);
+                }
+            });
+            
+            // Si no hay proveedores con productos, mostrar mensaje
+            if (supplierStatsContainer.children.length === 0) {
+                supplierStatsContainer.innerHTML = '<p style="text-align: center; color: #7f8c8d;">No hay productos por proveedor aún.</p>';
+            }
+        }
+
+        // Actualizar cantidad de un producto
+        function updateQuantity(id, change) {
+            const productIndex = inventory.findIndex(item => item.id === id);
+            
+            if (productIndex !== -1) {
+                const newQuantity = inventory[productIndex].quantity + change;
+                
+                // Validar que la cantidad no sea menor que 1
+                if (newQuantity >= 1) {
+                    inventory[productIndex].quantity = newQuantity;
+                    saveInventory();
+                    renderInventory();
+                    updateCategoryStats();
+                    updateSupplierStats();
+                    updateExportPreview();
+                    showAlert(`Cantidad actualizada a ${newQuantity}`, 'success');
+                } else {
+                    showAlert('La cantidad no puede ser menor a 1', 'error');
+                }
+            }
+        }
+
+        // Abrir modal para descontar productos
+        function openSubtractModal(id) {
+            const productIndex = inventory.findIndex(item => item.id === id);
+            
+            if (productIndex !== -1) {
+                selectedProductForSubtraction = inventory[productIndex];
+                
+                subtractModalBody.innerHTML = `
+                    <p>Producto: <strong>${selectedProductForSubtraction.name}</strong></p>
+                    <p>Cantidad actual: <strong>${selectedProductForSubtraction.quantity}</strong></p>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label for="subtract-quantity">Cantidad a descontar:</label>
+                        <input type="number" id="subtract-quantity" min="1" max="${selectedProductForSubtraction.quantity}" value="1">
+                    </div>
+                    <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                        <button class="btn btn-warning" id="confirm-subtract">
+                            <i class="fas fa-check"></i> Descontar
+                        </button>
+                        <button class="btn" id="cancel-subtract" style="background-color: #f0f0f0;">
+                            Cancelar
+                        </button>
+                    </div>
+                `;
+                
+                subtractModal.style.display = 'flex';
+                
+                // Configurar eventos dentro del modal
+                document.getElementById('confirm-subtract').addEventListener('click', function() {
+                    subtractProduct();
+                });
+                
+                document.getElementById('cancel-subtract').addEventListener('click', function() {
+                    closeSubtractModalFunc();
+                });
+                
+                // Permitir descontar con Enter
+                document.getElementById('subtract-quantity').addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        subtractProduct();
+                    }
+                });
+            }
+        }
+
+        // Descontar producto (cantidad exacta)
+        function subtractProduct() {
+            if (!selectedProductForSubtraction) return;
+            
+            const subtractQuantity = parseInt(document.getElementById('subtract-quantity').value);
+            const productIndex = inventory.findIndex(item => item.id === selectedProductForSubtraction.id);
+            
+            if (productIndex !== -1) {
+                if (isNaN(subtractQuantity) || subtractQuantity <= 0) {
+                    showAlert('Por favor, introduce una cantidad válida para descontar', 'error');
+                    return;
+                }
+                
+                if (subtractQuantity > inventory[productIndex].quantity) {
+                    showAlert(`No puedes descontar más de ${inventory[productIndex].quantity} unidades`, 'error');
+                    return;
+                }
+                
+                const newQuantity = inventory[productIndex].quantity - subtractQuantity;
+                
+                if (newQuantity < 0) {
+                    showAlert('La cantidad resultante no puede ser negativa', 'error');
+                    return;
+                }
+                
+                if (newQuantity === 0) {
+                    if (confirm(`¿Estás seguro de que quieres eliminar completamente "${inventory[productIndex].name}"?`)) {
+                        inventory.splice(productIndex, 1);
+                        showAlert(`Producto "${selectedProductForSubtraction.name}" eliminado completamente`, 'success');
+                    } else {
+                        closeSubtractModalFunc();
+                        return;
+                    }
+                } else {
+                    inventory[productIndex].quantity = newQuantity;
+                    showAlert(`Se descontaron ${subtractQuantity} unidades de "${selectedProductForSubtraction.name}"`, 'success');
+                }
+                
+                saveInventory();
+                renderInventory();
+                updateCategoryButtons();
+                updateSupplierButtons();
+                updateCategoryStats();
+                updateSupplierStats();
+                updateExportPreview();
+                closeSubtractModalFunc();
+            }
+        }
+
+        // Cerrar modal de descuento
+        function closeSubtractModalFunc() {
+            subtractModal.style.display = 'none';
+            selectedProductForSubtraction = null;
+        }
+
+        // Editar producto
+        function editProduct(id) {
+            const productIndex = inventory.findIndex(item => item.id === id);
+            
+            if (productIndex !== -1) {
+                const product = inventory[productIndex];
+                
+                // Pedir nuevo nombre, categoría y proveedor
+                const newName = prompt('Editar nombre del producto:', product.name);
+                if (newName === null) return; // Usuario canceló
+                
+                const newCategory = prompt('Editar categoría del producto (Bebestibles, Papeles, Abarrotes, Congelados, Snacks, Aseo personal, Aseo para el hogar, Mascotas):', product.category);
+                if (newCategory === null) return; // Usuario canceló
+                
+                // Validar nueva categoría
+                if (!Object.keys(CATEGORIES).includes(newCategory.trim())) {
+                    showAlert('Categoría no válida. Las categorías permitidas son: Bebestibles, Papeles, Abarrotes, Congelados, Snacks, Aseo personal, Aseo para el hogar, Mascotas', 'error');
+                    return;
+                }
+                
+                // Mostrar lista de proveedores para seleccionar
+                let supplierList = "Proveedores disponibles:\n";
+                suppliers.forEach((supplier, index) => {
+                    supplierList += `${index + 1}. ${supplier.name}\n`;
+                });
+                
+                const supplierInput = prompt(`${supplierList}\nIngresa el número del nuevo proveedor o deja vacío para mantener el actual (${product.supplierName}):`);
+                
+                let newSupplierId = product.supplierId;
+                let newSupplierName = product.supplierName;
+                
+                if (supplierInput !== null && supplierInput.trim() !== '') {
+                    const supplierIndex = parseInt(supplierInput) - 1;
+                    if (supplierIndex >= 0 && supplierIndex < suppliers.length) {
+                        newSupplierId = suppliers[supplierIndex].id;
+                        newSupplierName = suppliers[supplierIndex].name;
+                    } else {
+                        showAlert('Número de proveedor no válido', 'error');
+                        return;
+                    }
+                }
+                
+                if (newName.trim() !== '' && newCategory.trim() !== '') {
+                    // Verificar que no haya duplicados (mismo nombre, categoría y proveedor)
+                    const existingProductIndex = inventory.findIndex(item => 
+                        item.name.toLowerCase() === newName.trim().toLowerCase() && 
+                        item.category === newCategory.trim() &&
+                        item.supplierId === newSupplierId &&
+                        item.id !== id
+                    );
+                    
+                    if (existingProductIndex === -1) {
+                        inventory[productIndex].name = newName.trim();
+                        inventory[productIndex].category = newCategory.trim();
+                        inventory[productIndex].supplierId = newSupplierId;
+                        inventory[productIndex].supplierName = newSupplierName;
+                        saveInventory();
+                        renderInventory();
+                        updateCategoryButtons();
+                        updateSupplierButtons();
+                        updateCategoryStats();
+                        updateSupplierStats();
+                        updateExportPreview();
+                        showAlert('Producto actualizado correctamente', 'success');
+                    } else {
+                        showAlert('Ya existe un producto con ese nombre en la misma categoría y proveedor', 'error');
+                    }
+                }
+            }
+        }
+
+        // Eliminar producto
+        function deleteProduct(id) {
+            if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+                const productIndex = inventory.findIndex(item => item.id === id);
+                
+                if (productIndex !== -1) {
+                    const productName = inventory[productIndex].name;
+                    inventory.splice(productIndex, 1);
+                    saveInventory();
+                    renderInventory();
+                    updateCategoryButtons();
+                    updateSupplierButtons();
+                    updateCategoryStats();
+                    updateSupplierStats();
+                    updateExportPreview();
+                    showAlert(`Producto "${productName}" eliminado`, 'success');
+                }
+            }
+        }
+
+        // Agregar nuevo proveedor desde el panel
+        function addNewProvider() {
+            const name = newProviderNameInput.value.trim();
+            
+            if (!name) {
+                showAlert('Por favor, introduce un nombre para el proveedor', 'error');
+                newProviderNameInput.focus();
+                return;
+            }
+            
+            // Verificar si el proveedor ya existe
+            if (suppliers.some(supplier => supplier.name.toLowerCase() === name.toLowerCase())) {
+                showAlert('Ya existe un proveedor con ese nombre', 'error');
+                newProviderNameInput.focus();
+                return;
+            }
+            
+            // Agregar nuevo proveedor
+            const newSupplier = {
+                id: Date.now(),
+                name: name,
+                contact: '',
+                phone: '',
+                productCount: 0
+            };
+            
+            suppliers.push(newSupplier);
+            saveSuppliers();
+            populateSupplierDropdowns();
+            populateExportSupplierSelect();
+            renderProviderList();
+            newProviderNameInput.value = '';
+            showAlert(`Proveedor "${name}" agregado con éxito`, 'success');
+        }
+
+        // Abrir modal para agregar proveedor
+        function openProviderModal() {
+            modalProviderName.value = '';
+            modalProviderContact.value = '';
+            modalProviderPhone.value = '';
+            providerModal.style.display = 'flex';
+            modalProviderName.focus();
+        }
+
+        // Guardar proveedor desde el modal
+        function saveProviderFromModal() {
+            const name = modalProviderName.value.trim();
+            const contact = modalProviderContact.value.trim();
+            const phone = modalProviderPhone.value.trim();
+            
+            if (!name) {
+                showAlert('Por favor, introduce un nombre para el proveedor', 'error');
+                modalProviderName.focus();
+                return;
+            }
+            
+            // Verificar si el proveedor ya existe
+            if (suppliers.some(supplier => supplier.name.toLowerCase() === name.toLowerCase())) {
+                showAlert('Ya existe un proveedor con ese nombre', 'error');
+                modalProviderName.focus();
+                return;
+            }
+            
+            // Agregar nuevo proveedor
+            const newSupplier = {
+                id: Date.now(),
+                name: name,
+                contact: contact,
+                phone: phone,
+                productCount: 0
+            };
+            
+            suppliers.push(newSupplier);
+            saveSuppliers();
+            populateSupplierDropdowns();
+            populateExportSupplierSelect();
+            renderProviderList();
+            closeProviderModalFunc();
+            showAlert(`Proveedor "${name}" agregado con éxito`, 'success');
+        }
+
+        // Cerrar modal de proveedor
+        function closeProviderModalFunc() {
+            providerModal.style.display = 'none';
+        }
+
+        // Renderizar lista de proveedores
+        function renderProviderList() {
+            providerListContainer.innerHTML = '';
+            
+            if (suppliers.length === 0) {
+                providerListContainer.innerHTML = '<p style="text-align: center; color: #7f8c8d;">No hay proveedores registrados.</p>';
+                return;
+            }
+            
+            suppliers.forEach(supplier => {
+                const providerItem = document.createElement('div');
+                providerItem.className = 'provider-item';
+                
+                const productCount = inventory.filter(item => item.supplierId === supplier.id).length;
+                
+                providerItem.innerHTML = `
+                    <div>
+                        <div class="provider-name">${supplier.name}</div>
+                        <div style="font-size: 0.9rem; color: #7f8c8d;">
+                            ${supplier.contact ? `Contacto: ${supplier.contact}` : ''}
+                            ${supplier.phone ? ` | Tel: ${supplier.phone}` : ''}
+                        </div>
+                    </div>
+                    <div>
+                        <span class="provider-products-count">${productCount} producto(s)</span>
+                        <button class="action-btn delete-btn btn-small" onclick="deleteProvider(${supplier.id})" style="margin-left: 10px;">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+                
+                providerListContainer.appendChild(providerItem);
+            });
+        }
+
+        // Eliminar proveedor
+        function deleteProvider(id) {
+            // Verificar si el proveedor tiene productos asociados
+            const productCount = inventory.filter(item => item.supplierId === id).length;
+            
+            if (productCount > 0) {
+                showAlert(`No puedes eliminar este proveedor porque tiene ${productCount} producto(s) asociado(s). Primero elimina o reasigna los productos.`, 'error');
+                return;
+            }
+            
+            const supplierIndex = suppliers.findIndex(supplier => supplier.id === id);
+            
+            if (supplierIndex !== -1 && confirm('¿Estás seguro de que quieres eliminar este proveedor?')) {
+                const supplierName = suppliers[supplierIndex].name;
+                suppliers.splice(supplierIndex, 1);
+                saveSuppliers();
+                populateSupplierDropdowns();
+                populateExportSupplierSelect();
+                renderProviderList();
+                showAlert(`Proveedor "${supplierName}" eliminado`, 'success');
+            }
+        }
+
+        // Exportar a Excel
+        function exportToExcel(type, supplierId = null) {
+            let dataToExport = [];
+            
+            // Determinar qué datos exportar según el tipo
+            if (type === 'all') {
+                dataToExport = [...inventory];
+            } else if (type === 'current') {
+                // Obtener productos filtrados actuales
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedCategory = filterCategoryInput.value;
+                const selectedSupplier = filterSupplierInput.value ? parseInt(filterSupplierInput.value) : null;
+
+                dataToExport = inventory.filter(item => {
+                    const matchesSearch = item.name.toLowerCase().includes(searchTerm);
+                    const matchesCategory = !selectedCategory || item.category === selectedCategory;
+                    const matchesSupplier = !selectedSupplier || item.supplierId === selectedSupplier;
+                    return matchesSearch && matchesCategory && matchesSupplier;
+                });
+            } else if (type === 'supplier' && supplierId) {
+                dataToExport = inventory.filter(item => item.supplierId === parseInt(supplierId));
+            }
+            
+            if (dataToExport.length === 0) {
+                showAlert('No hay datos para exportar', 'error');
+                return;
+            }
+            
+            // Crear datos en el formato solicitado
+            const excelData = [
+                // Primera fila vacía (como en el formato solicitado)
+                ['', '', ''],
+                // Segunda fila vacía (como en el formato solicitado)
+                ['', '', ''],
+                // Encabezados
+                ['Proveedor', 'Producto', 'Cantidad'],
+                // Datos
+                ...dataToExport.map(item => [item.supplierName, item.name, item.quantity])
+            ];
+            
+            // Crear libro de trabajo
+            const wb = XLSX.utils.book_new();
+            
+            // Crear hoja de trabajo
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            
+            // Ajustar el ancho de las columnas
+            const colWidths = [
+                { wch: 30 }, // Proveedor
+                { wch: 40 }, // Producto
+                { wch: 15 }  // Cantidad
+            ];
+            ws['!cols'] = colWidths;
+            
+            // Estilo para los encabezados
+            const headerRange = XLSX.utils.decode_range(ws['!ref']);
+            for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+                const headerCell = XLSX.utils.encode_cell({ r: 2, c: C }); // Fila 3 (índice 2)
+                if (ws[headerCell]) {
+                    ws[headerCell].s = {
+                        font: { bold: true, color: { rgb: "FFFFFF" } },
+                        fill: { fgColor: { rgb: "2C3E50" } },
+                        alignment: { horizontal: "center" }
+                    };
+                }
+            }
+            
+            // Agregar hoja al libro
+            XLSX.utils.book_append_sheet(wb, ws, "Inventario");
+            
+            // Generar nombre de archivo con fecha
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+            const fileName = `INVENTARIO_${dateStr}.xlsx`;
+            
+            // Exportar archivo
+            XLSX.writeFile(wb, fileName);
+            
+            showAlert(`Archivo ${fileName} exportado con éxito con ${dataToExport.length} productos`, 'success');
+        }
+
+        // Mostrar alerta
+        function showAlert(message, type) {
+            // Crear elemento de alerta
+            const alertElement = document.createElement('div');
+            alertElement.className = `alert alert-${type}`;
+            alertElement.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            // Agregar al contenedor
+            alertContainer.appendChild(alertElement);
+            
+            // Mostrar con animación
+            setTimeout(() => {
+                alertElement.classList.add('show');
+            }, 10);
+            
+            // Ocultar y eliminar después de 4 segundos
+            setTimeout(() => {
+                alertElement.classList.remove('show');
+                setTimeout(() => {
+                    if (alertContainer.contains(alertElement)) {
+                        alertContainer.removeChild(alertElement);
+                    }
+                }, 500);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
+    
+  </body>
+  
+</html>
